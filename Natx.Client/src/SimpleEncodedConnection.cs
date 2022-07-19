@@ -76,3 +76,60 @@ public class Test : SimpleEncodedConnection
         }
     }
 }
+
+public class SearchReq {}
+public class SearchRes {}
+
+public delegate SearchRes Search(SearchReq searchReq);
+
+public class SearchServer
+{
+    private readonly EncodedConnection encodedConnection;
+    private readonly AsyncSubscription subscription;
+	private readonly Search search; 
+    public SearchServer(EncodedConnection encodedConnection, Search search)
+    {
+        this.encodedConnection = encodedConnection;
+        subscription = encodedConnection.SubscribeAsync("internal.hotel.search", "abc", typeof(SearchRes));
+        this.search = search;
+        subscription.MessageHandler += onMessage;
+    }
+    private void onMessage(object? sender, MsgHandlerEventArgs e)
+    {
+        try
+        {
+            SearchRes response = search((SearchReq) e.Message.Data);
+            e.Message.Respond(response);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+    }
+    public void Start()
+    {
+        subscription.Start();
+    }
+    public void Stop()
+    {
+        subscription.Unsubscribe();
+    }
+}
+
+
+public class SearchClient
+{
+    private readonly EncodedConnection encodedConnection;
+	private readonly TimeSpan timeout;
+    public SearchClient(EncodedConnection encodedConnection, TimeSpan timeout)
+    {
+        this.encodedConnection = encodedConnection;
+		this.timeout = timeout;
+    }
+    public SearchRes Request(SearchReq request)
+    {
+		Msg msg = encodedConnection.Request("internal.hotel.search", request, timeout, typeof(SearchRes));
+        return (SearchRes) msg.Data;
+    }
+}
+
