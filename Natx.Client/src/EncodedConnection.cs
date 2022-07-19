@@ -2,10 +2,10 @@ namespace Natx.Client;
 
 public abstract class EncodedConnection : Natx.Abstraction.IEncodedConnection
 {
-    public NATS.Client.IConnection Connection { get; }
-    public EncodedConnection()
+    public NATS.Client.IConnection Connection { get; private protected set; }
+    protected EncodedConnection(NATS.Client.IConnection connection)
     {
-        Connection = new NATS.Client.ConnectionFactory().CreateConnection();
+        Connection = connection;
     }
     public void Publish(string subject, object data)
     {
