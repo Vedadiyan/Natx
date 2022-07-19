@@ -7,6 +7,8 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="../Natx.Abstraction/Natx.Abstraction.csproj"></ProjectReference>
+    <PackageReference Include="Google.Protobuf" Version="3.21.1" />
+    <PackageReference Include="ZstdNet" Version="1.4.5" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Nats.Client" Version="0.14.8" />

@@ -22,51 +22,51 @@ public abstract class EncodedConnection : Natx.Abstraction.IEncodedConnection
         byte[] bytes = Encode(data);
         Connection.Publish(subject, reply, bytes);
     }
-    public Msg Request(string subject, object data)
+    public Msg Request(string subject, object data, Type typeOfResponse)
     {
         byte[] bytes = Encode(data);
         NATS.Client.Msg msg = Connection.Request(subject, bytes);
-        return new Msg(msg, Decode(msg.Data));
+        return new Msg(msg, Decode(msg.Data, typeOfResponse));
     }
-    public Msg Request(Msg msg)
+    public Msg Request(Msg msg, Type typeOfResponse)
     {
         msg.Message.Data = Encode(msg.Data);
         NATS.Client.Msg response = Connection.Request(msg.Message);
-        return new Msg(response, Decode(response.Data));
+        return new Msg(response, Decode(response.Data, typeOfResponse));
     }
-    public Msg Request(Msg msg, TimeSpan timeout)
+    public Msg Request(Msg msg, TimeSpan timeout, Type typeOfResponse)
     {
         msg.Message.Data = Encode(msg.Data);
         NATS.Client.Msg response = Connection.Request(msg.Message, (int)timeout.TotalMilliseconds);
-        return new Msg(response, Decode(response.Data));
+        return new Msg(response, Decode(response.Data, typeOfResponse));
     }
-    public Msg Request(string subject, object data, TimeSpan timeout)
+    public Msg Request(string subject, object data, TimeSpan timeout, Type typeOfResponse)
     {
         byte[] bytes = Encode(data);
         NATS.Client.Msg msg = Connection.Request(subject, bytes, (int)timeout.TotalMilliseconds);
-        return new Msg(msg, Decode(msg.Data));
+        return new Msg(msg, Decode(msg.Data, typeOfResponse));
     }
-    public SyncSubscription SubscribeSync(string subject)
+    public SyncSubscription SubscribeSync(string subject, Type typeOfResponse)
     {
         NATS.Client.ISyncSubscription syncSubscription = Connection.SubscribeSync(subject);
-        return new SyncSubscription(this, syncSubscription);
+        return new SyncSubscription(this, syncSubscription, typeOfResponse);
     }
-    public SyncSubscription SubscribeSync(string subject, string queue)
+    public SyncSubscription SubscribeSync(string subject, string queue, Type typeOfResponse)
     {
         NATS.Client.ISyncSubscription syncSubscription = Connection.SubscribeSync(subject, queue);
-        return new SyncSubscription(this, syncSubscription);
+        return new SyncSubscription(this, syncSubscription, typeOfResponse);
     }
-    public AsyncSubscription SubscribeAsync(string subject)
+    public AsyncSubscription SubscribeAsync(string subject, Type typeOfResponse)
     {
         NATS.Client.IAsyncSubscription asyncSubscription = Connection.SubscribeAsync(subject);
-        return new AsyncSubscription(this, asyncSubscription);
+        return new AsyncSubscription(this, asyncSubscription, typeOfResponse);
     }
-    public AsyncSubscription SubscribeAsync(string subject, string queue)
+    public AsyncSubscription SubscribeAsync(string subject, string queue, Type typeOfResponse)
     {
         NATS.Client.IAsyncSubscription asyncSubscription = Connection.SubscribeAsync(subject, queue);
-        return new AsyncSubscription(this, asyncSubscription);
+        return new AsyncSubscription(this, asyncSubscription, typeOfResponse);
     }
 
-    public abstract object Decode(byte[] data);
+    public abstract object Decode(byte[] data, Type type);
     public abstract byte[] Encode(object data);
 }
